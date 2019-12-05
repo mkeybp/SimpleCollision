@@ -23,8 +23,12 @@ namespace SimpleCollision
 
         Color playerColor = Color.White;
         Texture2D playerSprite, enemySprite;
-        float moveSpeed = 50f;
-        Rectangle player, enemy;
+        float moveSpeed = 200f;
+        private Vector2 velocity;
+        private KeyboardState currentKey;
+        private KeyboardState previousKey;
+
+        //Rectangle player, enemy;
 
 
         public GameWorld()
@@ -54,8 +58,8 @@ namespace SimpleCollision
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            playerSprite = Content.Load<Texture2D>("1player");
 
+            playerSprite = Content.Load<Texture2D>("1player");
             enemySprite = Content.Load<Texture2D>("1trashcan");
 
 
@@ -81,22 +85,54 @@ namespace SimpleCollision
         {
 
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            //    Exit();
 
-            keyState = Keyboard.GetState();
+            //keyState = Keyboard.GetState();
 
-            if (keyState.IsKeyDown(Keys.D))
+            //if (keyState.IsKeyDown(Keys.D))
+            //{
+            //    position.X += moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //}
+            //else if (keyState.IsKeyDown(Keys.A))
+            //    position.X -= moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //else if (keyState.IsKeyDown(Keys.W))
+            //    position.Y -= moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            //else if (keyState.IsKeyDown(Keys.S))
+            //    position.Y += moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            currentKey = Keyboard.GetState();
+            previousKey = currentKey;
+
+            velocity = Vector2.Zero;
+
+            if (currentKey.IsKeyDown(Keys.D))
             {
-                position.X += moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                velocity += new Vector2(1, 0);
             }
-            else if (keyState.IsKeyDown(Keys.A))
-                position.X -= moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            else if (keyState.IsKeyDown(Keys.W))
-                position.Y -= moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            else if (keyState.IsKeyDown(Keys.S))
-                position.Y += moveSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (currentKey.IsKeyDown(Keys.A))
+            {
+                velocity += new Vector2(-1, 0);
+            }
+            if (currentKey.IsKeyDown(Keys.W))
+            {
+                velocity += new Vector2(0, -1);
+            }
+            if (currentKey.IsKeyDown(Keys.S))
+            {
+                velocity += new Vector2(0, 1);
+            }
+            if ((currentKey.IsKeyDown(Keys.D)) || (currentKey.IsKeyDown(Keys.A)) || currentKey.IsKeyDown(Keys.S))
+            {
+                //Animation(gameTime);
+            }
+            if (velocity != Vector2.Zero)
+            {
+                velocity.Normalize();
+            }
 
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            position += ((velocity * moveSpeed) * deltaTime);
 
             if (position.X + playerSprite.Width < 100 || position.X > 100 + enemySprite.Width || position.Y + playerSprite.Height < 100 || position.Y > 100 + enemySprite.Height)
             {
